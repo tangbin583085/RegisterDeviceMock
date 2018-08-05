@@ -1,0 +1,12 @@
+/build/
+/build-*/
+/install/
+/out/
+/Testing/
+/test-results/
+CMakeUserPresets.json
+*.user
+*.swp
+.DS_Store
+.vscode/
+.idea/
