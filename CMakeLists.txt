@@ -22,3 +22,32 @@ target_include_directories(RegisterDeviceMock PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     $<INSTALL_INTERFACE:include>
 )
+
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+install(TARGETS RegisterDeviceMock EXPORT RegisterDeviceMockTargets
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(EXPORT RegisterDeviceMockTargets NAMESPACE RDM::
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/RegisterDeviceMock
+)
+configure_package_config_file(cmake/RegisterDeviceMockConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/RegisterDeviceMockConfig.cmake
+    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/RegisterDeviceMock
+)
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/RegisterDeviceMockConfigVersion.cmake
+    VERSION ${PROJECT_VERSION} COMPATIBILITY SameMinorVersion
+)
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/RegisterDeviceMockConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/RegisterDeviceMockConfigVersion.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/RegisterDeviceMock
+)
+install(FILES LICENSE DESTINATION ${CMAKE_INSTALL_DATADIR}/RegisterDeviceMock)
+
+if(RDM_BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
