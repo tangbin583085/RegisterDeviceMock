@@ -1,0 +1,5 @@
+foreach(test_name definitions bank policies scheduler device)
+    add_executable(rdm_test_${test_name} ${test_name}.cpp)
+    target_link_libraries(rdm_test_${test_name} PRIVATE RDM::Core)
+    add_test(NAME rdm.${test_name} COMMAND rdm_test_${test_name})
+endforeach()
