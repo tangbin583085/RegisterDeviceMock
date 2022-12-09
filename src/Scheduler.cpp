@@ -8,6 +8,7 @@ namespace rdm {
 ScheduleResult Scheduler::schedule(Tick delay, Action action) {
     if (!action) return {Error::InvalidArgument, 0};
     if (delay > std::numeric_limits<Tick>::max() - now_) return {Error::TimeOverflow, 0};
+    if (nextId_ == 0) return {Error::EventIdExhausted, 0};
     const EventId id = nextId_++;
     events_.emplace(std::make_pair(now_ + delay, id), std::move(action));
     return {Error::None, id};
@@ -40,6 +41,7 @@ Error Scheduler::advance(Tick delta, std::size_t maxEvents) {
 
 void Scheduler::clear() noexcept {
     events_.clear();
+    // Keep IDs monotonic so an old cancellation token cannot cancel a new event.
 }
 
 } // namespace rdm
