@@ -25,7 +25,13 @@ bool Scheduler::cancel(EventId id) {
 }
 
 Error Scheduler::advance(Tick delta, std::size_t maxEvents) {
+    if (advancing_) return Error::Busy;
     if (delta > std::numeric_limits<Tick>::max() - now_) return Error::TimeOverflow;
+    struct AdvanceGuard {
+        bool& active;
+        explicit AdvanceGuard(bool& flag) : active(flag) { active = true; }
+        ~AdvanceGuard() { active = false; }
+    } guard(advancing_);
     const Tick target = now_ + delta;
     std::size_t executed = 0;
     while (!events_.empty() && events_.begin()->first.first <= target) {
