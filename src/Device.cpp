@@ -19,6 +19,7 @@ AccessResult Device::write(Address address, Value value) {
 }
 
 void Device::reset() {
+    scheduler_.clear();
     bank_.reset();
 }
 
