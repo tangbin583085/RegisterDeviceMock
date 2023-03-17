@@ -14,7 +14,11 @@ Error Device::onWrite(Address address, WriteHandler handler) {
 AccessResult Device::write(Address address, Value value) {
     const auto result = bank_.write(address, value);
     const auto it = handlers_.find(address);
-    if (result.ok() && it != handlers_.end()) it->second(*this, address, value, result);
+    if (result.ok() && it != handlers_.end()) {
+        // A handler may replace or remove itself while it is running.
+        const auto handler = it->second;
+        handler(*this, address, value, result);
+    }
     return result;
 }
 
