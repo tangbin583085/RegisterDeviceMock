@@ -18,6 +18,25 @@ static void tests() {
     device.reset();
     CHECK(device.read(2).value == 0);
     CHECK(device.onWrite(99, {}) == rdm::Error::UnknownAddress);
+    CHECK(device.write(1, 1).ok());
+    CHECK(device.pending() == 1);
+    const auto timeBeforeReset = device.now();
+    device.reset();
+    CHECK(device.pending() == 0 && device.now() == timeBeforeReset);
+    CHECK(device.advance(100) == rdm::Error::None);
+    CHECK(device.read(2).value == 0);
+
+    int calls = 0;
+    CHECK(device.onWrite(1, [&](rdm::Device& dev, rdm::Address address, rdm::Value, const rdm::AccessResult&) {
+        ++calls;
+        CHECK(dev.onWrite(address, {}) == rdm::Error::None);
+    }) == rdm::Error::None);
+    CHECK(device.write(1, 2).ok());
+    CHECK(device.write(1, 3).ok());
+    CHECK(calls == 1);
+    CHECK(device.onWrite(2, [&](rdm::Device&, rdm::Address, rdm::Value, const rdm::AccessResult&) { ++calls; }) == rdm::Error::None);
+    CHECK(device.write(2, 3).error == rdm::Error::WriteDenied);
+    CHECK(calls == 1);
 }
 
 int main() { return runTests(tests); }
