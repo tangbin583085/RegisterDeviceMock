@@ -25,6 +25,16 @@ static void tests() {
     CHECK(bank.update(0x20, 0x100).error == rdm::Error::InvalidValue);
     CHECK(bank.peek(0x20).value == 13);
     CHECK(bank.update(0x30, 0).error == rdm::Error::UnknownAddress);
+    bank.log().setCapacity(2);
+    (void)bank.read(0x10);
+    (void)bank.read(0x20);
+    (void)bank.read(0x30);
+    CHECK(bank.log().records().size() == 2);
+    CHECK(bank.log().records().front().address == 0x20);
+    CHECK(bank.log().records().back().result.error == rdm::Error::UnknownAddress);
+    bank.log().setCapacity(0);
+    (void)bank.read(0x10);
+    CHECK(bank.log().records().empty());
 }
 
 int main() { return runTests(tests); }
