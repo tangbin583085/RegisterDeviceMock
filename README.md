@@ -46,4 +46,36 @@ RegisterDeviceMock is a small C++17 library for simulating device registers. It 
 
 Access rules are configurable per bit, including read-only, write-only, write-one-to-clear and clear-on-read. Applications define device behavior and advance simulated time explicitly.
 
+### Integration
+
+Use C++17 and CMake 3.16 or newer. Qt is optional. Add the source directory to your CMake project:
+
+```cmake
+add_subdirectory(path/to/RegisterDeviceMock)
+target_link_libraries(your_app PRIVATE RDM::Core)
+```
+
+For an installed package, use `find_package(RegisterDeviceMock 0.1 CONFIG REQUIRED)` and link the same target. See [build instructions](docs/building.md#english) for build, install and test commands.
+
+### Basic use
+
+```cpp
+#include <RegisterDeviceMock/RegisterDeviceMock.hpp>
+#include <iostream>
+
+int main() {
+    rdm::RegisterBank bank;
+    if (bank.add({0x20, "fault", 8, 0x0f, 0xff,
+                  rdm::AccessPolicy::writeOneToClear()}) != rdm::Error::None) {
+        return 1;
+    }
+    if (!bank.write(0x20, 0x05)) return 1;
+    const auto result = bank.read(0x20);
+    if (!result) return 1;
+    std::cout << result.value << '\n'; // 10 (0x0a)
+}
+```
+
+Use `rdm::Device` when a write should trigger behavior. A handler can update a status register and schedule a completion action. Call `advance()` to move virtual time forward; no thread sleeps are involved. See the [simulated device example](examples/simulated_device/main.cpp).
+
 License: MIT.
