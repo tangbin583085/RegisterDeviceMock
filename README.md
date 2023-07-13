@@ -88,4 +88,14 @@ int main() {
 
 Use `rdm::Device` when a write should trigger behavior. A handler can update a status register and schedule a completion action. Call `advance()` to move virtual time forward; no thread sleeps are involved. See the [simulated device example](examples/simulated_device/main.cpp).
 
+### Usage notes
+
+- Registers have a width of 1–32 bits. Addresses, alignment and byte order belong to your device model and adapter.
+- A read returns readable bits before applying clear-on-read. A write-one-to-clear bit changes only when its input bit is one.
+- Use `peek()` for side-effect-free internal inspection and `update()` for device-owned state changes.
+- `reset()` restores reset values, clears access records and cancels pending actions. Handlers and current simulated time are retained.
+- Use the library from one thread, or synchronize access externally. Protocol encoding and serial/TCP access belong in an application adapter.
+
+More details: [register rules](docs/register-rules.md#english), [device behavior](docs/device-behavior.md#english).
+
 License: MIT.

@@ -11,3 +11,13 @@
 库按单线程使用设计；Qt 应在同一线程调用，或由外部加锁。回调捕获的对象必须活到动作执行或取消。回调异常向调用方传播，已经发生的寄存器变更不回滚，已经取出的事件不会自动重试。
 
 `AccessResult` 描述写入本身的结果；回调可能随后改变设备状态，应重新读取需要观察的状态寄存器。模型应通过单独的状态/故障寄存器表达“忙”“执行失败”等业务结果。
+
+## English
+
+Register a single handler per address with `Device::onWrite()`. Successful device writes invoke it with the raw input and the completed write snapshot. Registering another handler replaces it; an empty handler removes it. Calling `registers().write()` directly bypasses device handlers. Reads have no user callback.
+
+Use internal `update()` calls for device-owned state. Schedule actions relative to current virtual time and advance time explicitly. Ticks have an application-defined unit. Events execute by due time, then registration order. Zero-delay events run during the next advance, including an advance already in progress, rather than inside `schedule()`.
+
+Each advance defaults to a budget of 10000 actions. On `EventLimitReached`, remaining events stay queued and time remains at the last executed event. Calculate the remaining interval before continuing; do not blindly repeat the original delta. Event identifiers are cancellation tokens, not reusable sequence positions.
+
+Callbacks may throw; exceptions propagate without rolling back register changes. A dequeued event is not retried. Captured objects must outlive event execution or cancellation. Access is single-threaded unless synchronized externally. A write result describes the write itself, not all later callback state changes; inspect status or fault registers for device-level results.

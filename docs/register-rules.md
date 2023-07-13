@@ -16,3 +16,17 @@
 `AccessResult.value` 在读取时是屏蔽后的读数，写入或内部更新时是更新后的完整内部值。`before`、`after` 是完整内部快照，供测试调试使用；不要将它们直接作为面向真实设备客户端的协议响应。失败时请先检查 `error`，不要把默认值当作有效读数。
 
 访问记录容量默认 256，满后移除最旧记录；容量设为 0 可关闭记录。记录含操作、地址、输入、结果及前后值，不包含墙上时钟时间。`reset()` 恢复复位值并清空访问记录。
+
+## English
+
+Addresses are unsigned 32-bit values. Your adapter decides whether they represent byte offsets or register numbers. The core does not infer alignment, stride or endianness.
+
+Widths range from 1 to 32 bits. The implemented mask is intersected with the width mask and must leave at least one bit. Reset values must fit the effective mask. Policy bits outside the effective mask are ignored, allowing full-width default policies on narrow registers.
+
+Readable and writable masks are independent. W1C bits must also be writable; clear-on-read bits must also be readable. A write replaces normal writable bits and clears only W1C bits whose input is one. Read-only and reserved bits are preserved; inputs outside the register width are rejected. Reads return the masked value before clearing configured readable bits.
+
+`peek()` returns internal state without permissions, side effects or logging. `update()` applies a masked internal update without access restrictions and records it. Entirely unreadable or unwritable registers reject external access without changing state.
+
+For a read, `AccessResult.value` is the readable value; for a write or internal update it is the full resulting state. `before` and `after` expose internal snapshots for diagnostics, including non-readable bits. Do not use these snapshots as protocol responses to external clients. Check `error` before using a result.
+
+The log holds 256 records by default, evicts the oldest entry at capacity, and can be disabled with capacity zero. Records contain operation, address, input and result snapshots; they do not contain wall-clock timestamps. Reset restores register values and clears the log.
