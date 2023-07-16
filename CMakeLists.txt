@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 project(RegisterDeviceMock VERSION 0.1.0 LANGUAGES CXX)
 
+include(GNUInstallDirs)
+
 option(RDM_BUILD_TESTS "Build RegisterDeviceMock tests" OFF)
 option(RDM_BUILD_EXAMPLES "Build RegisterDeviceMock examples" OFF)
 
@@ -16,14 +18,13 @@ add_library(RegisterDeviceMock STATIC
     src/Scheduler.cpp
 )
 add_library(RDM::Core ALIAS RegisterDeviceMock)
-set_target_properties(RegisterDeviceMock PROPERTIES EXPORT_NAME Core)
+set_target_properties(RegisterDeviceMock PROPERTIES EXPORT_NAME Core POSITION_INDEPENDENT_CODE ON)
 target_compile_features(RegisterDeviceMock PUBLIC cxx_std_17)
 target_include_directories(RegisterDeviceMock PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<INSTALL_INTERFACE:include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
-include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 install(TARGETS RegisterDeviceMock EXPORT RegisterDeviceMockTargets
     ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
