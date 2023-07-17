@@ -44,7 +44,7 @@ int main() {
 - `reset()` 恢复复位值、清空访问记录并取消待执行动作，保留已配置的行为和当前模拟时间。
 - 按单线程使用，需要并发时由调用方同步。设备协议的编码、串口或 TCP 接入放在应用适配层。
 
-详细说明：[寄存器规则](docs/register-rules.md)、[设备行为](docs/device-behavior.md)。
+详细说明：[寄存器规则](docs/register-rules.md)、[设备行为](docs/device-behavior.md)、[Qt 接入](docs/qt-integration.md)。
 
 许可证：MIT。
 
@@ -96,6 +96,6 @@ Use `rdm::Device` when a write should trigger behavior. A handler can update a s
 - `reset()` restores reset values, clears access records and cancels pending actions. Handlers and current simulated time are retained.
 - Use the library from one thread, or synchronize access externally. Protocol encoding and serial/TCP access belong in an application adapter.
 
-More details: [register rules](docs/register-rules.md#english), [device behavior](docs/device-behavior.md#english).
+More details: [register rules](docs/register-rules.md#english), [device behavior](docs/device-behavior.md#english), [Qt integration](docs/qt-integration.md#english).
 
 License: MIT.
