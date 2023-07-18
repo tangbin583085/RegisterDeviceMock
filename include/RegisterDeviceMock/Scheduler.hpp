@@ -19,6 +19,12 @@ class Scheduler {
 public:
     using Action = std::function<void()>;
 
+    Scheduler() = default;
+    Scheduler(const Scheduler&) = delete;
+    Scheduler& operator=(const Scheduler&) = delete;
+    Scheduler(Scheduler&&) = delete;
+    Scheduler& operator=(Scheduler&&) = delete;
+
     ScheduleResult schedule(Tick delay, Action action);
     bool cancel(EventId id);
     Error advance(Tick delta, std::size_t maxEvents = 10000);

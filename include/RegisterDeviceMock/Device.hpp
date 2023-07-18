@@ -5,6 +5,7 @@
 
 #include <functional>
 #include <map>
+#include <memory>
 #include <utility>
 
 namespace rdm {
@@ -35,7 +36,8 @@ public:
 private:
     RegisterBank bank_;
     Scheduler scheduler_;
-    std::map<Address, WriteHandler> handlers_;
+    std::map<Address, std::shared_ptr<WriteHandler>> handlers_;
+    bool dispatching_{false};
 };
 
 } // namespace rdm

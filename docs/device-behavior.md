@@ -12,6 +12,10 @@
 
 `AccessResult` 描述写入本身的结果；回调可能随后改变设备状态，应重新读取需要观察的状态寄存器。模型应通过单独的状态/故障寄存器表达“忙”“执行失败”等业务结果。
 
+回调执行期间不允许嵌套 `Device::write()`，返回 `Busy`，不会修改寄存器或记录这次被拦截的写入；内部状态应使用 `update()`。回调可安全替换/移除自身，未被替换的可变回调状态会跨写入保留。异常离开时重入保护也会解除。
+
+`reset()` 取消所有待执行事件，恢复寄存器并清空日志；保留回调和当前时间，不重用旧事件 ID。`advance()` 不能嵌套调用，时间加法溢出会在执行前返回错误。`Device` 和 `Scheduler` 不可复制或移动，防止捕获旧对象引用或复制正在执行的状态。
+
 ## English
 
 Register a single handler per address with `Device::onWrite()`. Successful device writes invoke it with the raw input and the completed write snapshot. Registering another handler replaces it; an empty handler removes it. Calling `registers().write()` directly bypasses device handlers. Reads have no user callback.
@@ -21,3 +25,7 @@ Use internal `update()` calls for device-owned state. Schedule actions relative 
 Each advance defaults to a budget of 10000 actions. On `EventLimitReached`, remaining events stay queued and time remains at the last executed event. Calculate the remaining interval before continuing; do not blindly repeat the original delta. Event identifiers are cancellation tokens, not reusable sequence positions.
 
 Callbacks may throw; exceptions propagate without rolling back register changes. A dequeued event is not retried. Captured objects must outlive event execution or cancellation. Access is single-threaded unless synchronized externally. A write result describes the write itself, not all later callback state changes; inspect status or fault registers for device-level results.
+
+Nested `Device::write()` calls from a handler return `Busy` without mutation or logging. Use internal `update()` for model state. Handlers may replace or remove themselves safely; mutable handler state persists between writes unless the handler is replaced. Reentrancy guards are released even when a callback throws.
+
+Reset cancels pending actions, restores registers and clears logs, while retaining handlers and current time. Event identifiers are not reused. Nested advancement returns `Busy`; time overflow is rejected before execution. Device and Scheduler objects cannot be copied or moved, avoiding stale captured references and copied in-progress state.
