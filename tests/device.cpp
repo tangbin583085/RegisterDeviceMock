@@ -37,6 +37,24 @@ static void tests() {
     CHECK(device.onWrite(2, [&](rdm::Device&, rdm::Address, rdm::Value, const rdm::AccessResult&) { ++calls; }) == rdm::Error::None);
     CHECK(device.write(2, 3).error == rdm::Error::WriteDenied);
     CHECK(calls == 1);
+    CHECK(device.onWrite(1, [count = 0](rdm::Device& dev, rdm::Address, rdm::Value, const rdm::AccessResult&) mutable {
+        CHECK(dev.registers().update(2, static_cast<rdm::Value>(++count)).ok());
+        CHECK(dev.write(1, 99).error == rdm::Error::Busy);
+    }) == rdm::Error::None);
+    CHECK(device.write(1, 4).ok());
+    CHECK(device.write(1, 5).ok());
+    CHECK(device.read(2).value == 2);
+    CHECK(device.registers().peek(1).value == 5);
+
+    CHECK(device.onWrite(1, [](rdm::Device&, rdm::Address, rdm::Value, const rdm::AccessResult&) {
+        throw std::runtime_error("write callback failure");
+    }) == rdm::Error::None);
+    bool threw = false;
+    try { (void)device.write(1, 6); }
+    catch (const std::runtime_error&) { threw = true; }
+    CHECK(threw && device.registers().peek(1).value == 6);
+    CHECK(device.onWrite(1, {}) == rdm::Error::None);
+    CHECK(device.write(1, 7).ok());
 }
 
 int main() { return runTests(tests); }
