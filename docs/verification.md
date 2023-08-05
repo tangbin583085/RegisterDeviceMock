@@ -12,8 +12,12 @@
 
 使用者可按 [构建说明](building.md) 编译和运行测试。集成前还应使用自己的寄存器表、协议适配层和编译器验证。库使用动态容器和 `std::function`，不提供无堆分配或硬实时保证。
 
+源码文本检查包括本地头文件引用、CMake 源文件清单、文档链接和代码围栏；另检查提交树内容、差异空白问题和沿用的作者/提交者日期。它们不能替代编译器检查、运行测试或跨平台验证。
+
 ## English
 
 No SDK, Qt or dependencies were installed for this delivery. CMake was not configured, the source was not compiled, and tests were not run. The table lists authored test coverage, not passing execution results.
 
 The sources cover definitions, register access policies, logging, virtual scheduling and device callbacks. Follow the [build instructions](building.md#english) to run them. Validate your own register map, transport adapter and compiler settings before integration. The implementation uses dynamic containers and `std::function`; it does not promise allocation-free operation or hard real-time behavior.
+
+Text checks cover local includes, CMake source inventories, documentation links and code fences. Git checks cover tree contents, whitespace and the retained author/committer date schedule. These checks do not replace compilation, runtime tests or cross-platform validation.

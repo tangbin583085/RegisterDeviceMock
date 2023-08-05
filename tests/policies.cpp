@@ -22,6 +22,11 @@ static void tests() {
     CHECK(bank.write(5, 0x05).value == 0xc1);
     CHECK(bank.update(5, 0xcc).ok());
     CHECK(bank.write(5, 0x05).value == 0xc9);
+    CHECK(bank.add({6, "partial event", 8, 0xa5, 0xff, {0x0f, 0, 0, 0x01}}) == rdm::Error::None);
+    const auto partial = bank.read(6);
+    CHECK(partial.value == 5 && partial.before == 0xa5 && partial.after == 0xa4);
+    CHECK(bank.peek(6).value == 0xa4);
+    CHECK(bank.read(6).value == 4);
 }
 
 int main() { return runTests(tests); }

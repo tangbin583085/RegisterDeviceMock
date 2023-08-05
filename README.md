@@ -46,6 +46,10 @@ int main() {
 
 详细说明：[寄存器规则](docs/register-rules.md)、[设备行为](docs/device-behavior.md)、[Qt 接入](docs/qt-integration.md)。
 
+### 示例与测试
+
+`examples/basic_registers` 演示普通读写和故障位清除；`examples/simulated_device` 演示启动、忙状态和完成事件。测试源码在 `tests/`。
+
 许可证：MIT。
 
 ---
@@ -97,5 +101,9 @@ Use `rdm::Device` when a write should trigger behavior. A handler can update a s
 - Use the library from one thread, or synchronize access externally. Protocol encoding and serial/TCP access belong in an application adapter.
 
 More details: [register rules](docs/register-rules.md#english), [device behavior](docs/device-behavior.md#english), [Qt integration](docs/qt-integration.md#english).
+
+### Examples and tests
+
+`examples/basic_registers` demonstrates access and fault clearing. `examples/simulated_device` shows a command, busy state and completion event. Test sources are under `tests/`.
 
 License: MIT.
